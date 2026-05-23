@@ -3,10 +3,37 @@ from __future__ import annotations
 from manim import *
 
 from radix_tree import RadixTree, _Node, _lcp
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class RadixTreeAnim(Scene):
     def construct(self):
+        self.camera.background_color = BG_DARK
+        self.subtitle_font = SUBTITLE_FONT
+
         pace = 1.15
 
         def t(seconds: float) -> float:
@@ -14,7 +41,7 @@ class RadixTreeAnim(Scene):
 
         tree = RadixTree[int]()
 
-        title = Text("Radix Tree", font_size=46).to_edge(UP)
+        title = Text("Radix Tree", font_size=46, color=NODE_ACTIVE).to_edge(UP)
         self.play(Write(title))
 
         subtitle = self.make_subtitle_group(
@@ -22,9 +49,14 @@ class RadixTreeAnim(Scene):
         )
         self.play(FadeIn(subtitle, shift=UP * 0.15), run_time=t(0.55))
 
-        mode_text = Text("Insert", font_size=30).next_to(title, DOWN)
+        mode_text = Text("Insert", font_size=30, color=TEXT_MUTED).next_to(title, DOWN)
+        info_text = Text(
+            "insert(key, value): split edge when only part of the label matches",
+            font_size=24,
+            color=TEXT_MUTED,
+        ).next_to(mode_text, DOWN)
         result_text = self.make_result_text("")
-        self.play(FadeIn(mode_text), FadeIn(result_text))
+        self.play(FadeIn(mode_text), FadeIn(info_text), FadeIn(result_text))
 
         tree_group, node_views = self.build_tree_group(tree)
         self.play(FadeIn(tree_group), run_time=t(0.8))
@@ -57,7 +89,7 @@ class RadixTreeAnim(Scene):
             for nid in path_ids:
                 group = node_views.get(nid)
                 if group is not None:
-                    self.play(Indicate(group, color=YELLOW), run_time=t(0.28))
+                    self.play(Indicate(group, color=EDGE_ACTIVE), run_time=t(0.28))
 
             self.play(
                 Transform(result_text, self.make_result_text(f"size={len(tree)}")),
@@ -106,7 +138,7 @@ class RadixTreeAnim(Scene):
             for nid in path_ids:
                 group = node_views.get(nid)
                 if group is not None:
-                    self.play(Indicate(group, color=TEAL if hit else RED), run_time=t(0.25))
+                    self.play(Indicate(group, color=NODE_ACTIVE if hit else RED), run_time=t(0.25))
 
             self.play(
                 Transform(result_text, self.make_result_text(f"search({word!r}) -> {val}")),
@@ -156,7 +188,7 @@ class RadixTreeAnim(Scene):
             for nid in path_before:
                 group = node_views.get(nid)
                 if group is not None:
-                    self.play(Indicate(group, color=ORANGE if deleted else RED), run_time=t(0.25))
+                    self.play(Indicate(group, color=EDGE_ACTIVE if deleted else RED), run_time=t(0.25))
 
             self.play(
                 Transform(result_text, self.make_result_text(f"delete({word!r}) -> {deleted}; size={len(tree)}")),
@@ -266,7 +298,7 @@ class RadixTreeAnim(Scene):
                 cx, cdepth = positions[child_id]
                 child = node_by_id[child_id]
 
-                edge_color = RED_E if failed and child_id in highlight_ids else GRAY_B
+                edge_color = RED_D if failed and child_id in highlight_ids else TEXT_MUTED
                 line = Line([x, y_of(depth), 0], [cx, y_of(cdepth), 0], color=edge_color, stroke_width=3)
                 edges.add(line)
 
@@ -293,11 +325,11 @@ class RadixTreeAnim(Scene):
             if failed and is_highlight:
                 fill = RED_D
             elif is_highlight:
-                fill = TEAL_D
+                fill = NODE_ACTIVE
             elif node.is_terminal:
-                fill = GREEN_E
+                fill = NODE_LEAF
             else:
-                fill = BLUE_E
+                fill = NODE_NEUTRAL
 
             radius = 0.24 if is_root else 0.2
             circle = Circle(radius=radius, color=WHITE, stroke_width=2)
@@ -309,7 +341,7 @@ class RadixTreeAnim(Scene):
             group = VGroup(circle, label).move_to([x, y_of(depth), 0])
 
             if node.is_terminal and not is_root:
-                terminal_dot = Dot(point=[0.13, 0.13, 0], radius=0.038, color=YELLOW)
+                terminal_dot = Dot(point=[0.13, 0.13, 0], radius=0.038, color=EDGE_ACTIVE)
                 group.add(terminal_dot)
 
             nodes.add(group)

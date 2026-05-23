@@ -5,10 +5,37 @@ from bisect import bisect_left
 from manim import *
 
 from bstar_tree import BStarTree, Node
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class BStarTreeAnim(Scene):
     def construct(self):
+        self.camera.background_color = BG_DARK
+        self.subtitle_font = SUBTITLE_FONT
+
         pace = 1.2
 
         def t(seconds: float) -> float:
@@ -16,7 +43,7 @@ class BStarTreeAnim(Scene):
 
         tree = BStarTree[int, int](max_keys=5)
 
-        title = Text("B* Tree", font_size=48).to_edge(UP)
+        title = Text("B* Tree", font_size=48, color=NODE_ACTIVE).to_edge(UP)
         self.play(Write(title))
 
         subtitle = self.make_subtitle_group(
@@ -24,8 +51,8 @@ class BStarTreeAnim(Scene):
         )
         self.play(FadeIn(subtitle, shift=UP * 0.15), run_time=t(0.55))
 
-        mode_text = Text("Insert", font_size=30).next_to(title, DOWN)
-        info_text = Text("Demonstrating insert, search, delete", font_size=24).next_to(mode_text, DOWN)
+        mode_text = Text("Insert", font_size=30, color=TEXT_MUTED).next_to(title, DOWN)
+        info_text = Text("Demonstrating insert, search, delete", font_size=24, color=TEXT_MUTED).next_to(mode_text, DOWN)
         stats_group = self.make_stats_group(tree.max_keys, tree.min_keys, tree.target_min_keys)
         result_text = self.make_result_text("")
         self.play(FadeIn(mode_text), FadeIn(info_text), FadeIn(stats_group), FadeIn(result_text))
@@ -57,7 +84,7 @@ class BStarTreeAnim(Scene):
             for node in path_nodes:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=YELLOW), run_time=t(0.3))
+                    self.play(Indicate(group, color=EDGE_ACTIVE), run_time=t(0.3))
 
             self.play(
                 Transform(result_text, self.make_result_text(f"inserted {key}")),
@@ -106,7 +133,7 @@ class BStarTreeAnim(Scene):
             for node in path_nodes:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=TEAL if hit else RED), run_time=t(0.28))
+                    self.play(Indicate(group, color=NODE_ACTIVE if hit else RED), run_time=t(0.28))
 
             msg = f"search({key}) -> {found_value}" if hit else f"search({key}) -> None"
             self.play(Transform(result_text, self.make_result_text(msg)), run_time=t(0.4))
@@ -154,7 +181,7 @@ class BStarTreeAnim(Scene):
             for node in path_before:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=ORANGE if deleted else RED), run_time=t(0.28))
+                    self.play(Indicate(group, color=EDGE_ACTIVE if deleted else RED), run_time=t(0.28))
 
             msg = "deleted" if deleted else "not found"
             self.play(
@@ -271,7 +298,7 @@ class BStarTreeAnim(Scene):
                 continue
             for child_id in meta["children"]:
                 cx, cdepth = positions[child_id]
-                edge_color = RED_E if failed and child_id in highlight_ids else GRAY_B
+                edge_color = RED_D if failed and child_id in highlight_ids else TEXT_MUTED
                 edges.add(Line([x, y_of(depth), 0], [cx, y_of(cdepth), 0], color=edge_color, stroke_width=3))
 
         for node_id, (x, depth) in positions.items():
@@ -280,11 +307,11 @@ class BStarTreeAnim(Scene):
             if failed and is_highlight:
                 fill = RED_D
             elif is_highlight:
-                fill = TEAL_D
+                fill = NODE_ACTIVE
             elif node.leaf:
-                fill = GREEN_E
+                fill = NODE_LEAF
             else:
-                fill = BLUE_E
+                fill = NODE_NEUTRAL
 
             rect = RoundedRectangle(
                 corner_radius=0.1,
@@ -300,7 +327,7 @@ class BStarTreeAnim(Scene):
 
             # Tiny marker helps viewers distinguish leaves from internal nodes.
             if node.leaf:
-                marker = Dot(point=[-0.33, 0.16, 0], color=YELLOW_E, radius=0.035)
+                marker = Dot(point=[-0.33, 0.16, 0], color=EDGE_ACTIVE, radius=0.035)
                 group.add(marker)
 
             nodes.add(group)

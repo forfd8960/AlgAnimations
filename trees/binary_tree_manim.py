@@ -3,16 +3,43 @@ from __future__ import annotations
 from manim import *
 
 from binary_tree import BinaryTree
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
-class BinaryTreeTraversal(Scene):
+class BinaryTreeAnim(Scene):
     def construct(self):
+        self.camera.background_color = BG_DARK
+        self.subtitle_font = SUBTITLE_FONT
+
         insert_step_run_time = 1.35
         insert_pause = 0.75
         traversal_visit_run_time = 1.05
         traversal_between_pause = 1.0
 
-        title = Text("Binary Tree", font_size=48).to_edge(UP)
+        title = Text("Binary Tree", font_size=48, color=NODE_ACTIVE).to_edge(UP)
         self.play(Write(title))
 
         subtitle_group = self.make_subtitle_group(
@@ -23,9 +50,9 @@ class BinaryTreeTraversal(Scene):
         bt = BinaryTree()
         values_to_insert = [1, 2, 3, 4, 5, 6, 7]
 
-        mode_text = Text("Insert (level-order)", font_size=30).next_to(title, DOWN)
+        mode_text = Text("Insert (level-order)", font_size=30, color=TEXT_MUTED).next_to(title, DOWN)
         sequence_text = Text(
-            f"Input sequence: {values_to_insert}", font_size=24
+            f"Input sequence: {values_to_insert}", font_size=24, color=TEXT_MUTED
         ).next_to(mode_text, DOWN)
         self.play(FadeIn(mode_text), FadeIn(sequence_text))
 
@@ -71,9 +98,9 @@ class BinaryTreeTraversal(Scene):
         )
 
         traversals = [
-            ("Inorder", self.inorder_values(bt.root), GREEN),
-            ("Preorder", self.preorder_values(bt.root), ORANGE),
-            ("Postorder", self.postorder_values(bt.root), PINK),
+            ("Inorder", self.inorder_values(bt.root), NODE_LEAF),
+            ("Preorder", self.preorder_values(bt.root), EDGE_ACTIVE),
+            ("Postorder", self.postorder_values(bt.root), NODE_ACTIVE),
         ]
 
         order_text = Text("", font_size=24).next_to(mode_text, DOWN)
@@ -174,13 +201,13 @@ class BinaryTreeTraversal(Scene):
         for node, (x, y) in positions.items():
             if node.left:
                 lx, ly = positions[node.left]
-                edges.add(Line([x, y, 0], [lx, ly, 0], stroke_width=3))
+                edges.add(Line([x, y, 0], [lx, ly, 0], stroke_width=3, color=TEXT_MUTED))
             if node.right:
                 rx, ry = positions[node.right]
-                edges.add(Line([x, y, 0], [rx, ry, 0], stroke_width=3))
+                edges.add(Line([x, y, 0], [rx, ry, 0], stroke_width=3, color=TEXT_MUTED))
 
         for node, (x, y) in positions.items():
-            fill_color = YELLOW if node.value == highlight_value else BLUE_E
+            fill_color = NODE_ACTIVE if node.value == highlight_value else NODE_NEUTRAL
             circle = Circle(radius=0.35, color=WHITE)
             circle.set_fill(fill_color, opacity=1.0)
             label = Text(str(node.value), font_size=24)
@@ -200,7 +227,7 @@ class BinaryTreeTraversal(Scene):
 
     def reset_node_colors(self, node_groups):
         for group in node_groups.values():
-            group[0].set_fill(BLUE_E, opacity=1.0)
+            group[0].set_fill(NODE_NEUTRAL, opacity=1.0)
 
     def inorder_values(self, node):
         if not node:

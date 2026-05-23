@@ -3,14 +3,41 @@ from __future__ import annotations
 from manim import *
 
 from trie import Trie
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class TrieAnim(Scene):
     def construct(self):
+        self.camera.background_color = BG_DARK
+        self.subtitle_font = SUBTITLE_FONT
+
         insert_step_time = 1.1
         walk_step_time = 0.7
 
-        title = Text("Trie", font_size=44).to_edge(UP)
+        title = Text("Trie", font_size=44, color=NODE_ACTIVE).to_edge(UP)
         self.play(Write(title))
 
         subtitle = self.make_subtitle_group(
@@ -21,8 +48,8 @@ class TrieAnim(Scene):
         trie = Trie()
         words = ["apple", "app", "apricot", "banana", "bat"]
 
-        mode_text = Text("Insert", font_size=30).next_to(title, DOWN)
-        info_text = Text(f"Words: {words}", font_size=24).next_to(mode_text, DOWN)
+        mode_text = Text("Insert", font_size=30, color=TEXT_MUTED).next_to(title, DOWN)
+        info_text = Text(f"Words: {words}", font_size=24, color=TEXT_MUTED).next_to(mode_text, DOWN)
         result_text = self.make_result_text("")
         self.play(FadeIn(mode_text), FadeIn(info_text), FadeIn(result_text))
 
@@ -65,7 +92,7 @@ class TrieAnim(Scene):
 
             for node in path_nodes:
                 group = node_views[id(node)]
-                self.play(Indicate(group, color=TEAL), run_time=walk_step_time)
+                self.play(Indicate(group, color=NODE_ACTIVE), run_time=walk_step_time)
 
             if exists_before:
                 msg = f"'{word}' was already in the trie. End flag stays True."
@@ -113,7 +140,7 @@ class TrieAnim(Scene):
                 run_time=0.4,
             )
             for node in path_nodes:
-                self.play(Indicate(node_views[id(node)], color=YELLOW), run_time=walk_step_time)
+                self.play(Indicate(node_views[id(node)], color=EDGE_ACTIVE), run_time=walk_step_time)
 
             if missing_char is not None:
                 msg = f"search('{word}') = False (missing '{missing_char}')"
@@ -160,7 +187,7 @@ class TrieAnim(Scene):
                 run_time=0.4,
             )
             for node in path_nodes:
-                self.play(Indicate(node_views[id(node)], color=BLUE_B), run_time=walk_step_time)
+                self.play(Indicate(node_views[id(node)], color=NODE_ACTIVE), run_time=walk_step_time)
 
             if missing_char is None:
                 msg = f"starts_with('{prefix}') = True"
@@ -274,16 +301,16 @@ class TrieAnim(Scene):
             px, pdepth, _, _ = layout[parent]
             p = [px, y_of(pdepth), 0]
             q = [x, y_of(depth), 0]
-            edge_color = RED_E if failed and id(node) in highlight_ids else GRAY_B
+            edge_color = RED_D if failed and id(node) in highlight_ids else TEXT_MUTED
             edges.add(Line(p, q, stroke_width=3, color=edge_color))
 
         for node, (x, depth, char, _parent) in layout.items():
             center = [x, y_of(depth), 0]
-            fill = BLUE_E
+            fill = NODE_NEUTRAL
             if id(node) in highlight_ids:
-                fill = TEAL_D
+                fill = NODE_ACTIVE
             if id(node) in new_ids:
-                fill = YELLOW_E
+                fill = EDGE_ACTIVE
 
             circle = Circle(radius=0.27, color=WHITE, stroke_width=2)
             circle.set_fill(fill, opacity=1.0)
@@ -293,7 +320,7 @@ class TrieAnim(Scene):
 
             group = VGroup(circle, label)
             if node.is_end_of_word:
-                end_mark = Dot(point=[0.22, 0.22, 0], radius=0.05, color=GREEN)
+                end_mark = Dot(point=[0.22, 0.22, 0], radius=0.05, color=NODE_LEAF)
                 group.add(end_mark)
 
             group.move_to(center)

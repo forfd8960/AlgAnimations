@@ -15,6 +15,8 @@ Every path from a node to any of its descendant empty leaf slots must contain th
 
 from enum import Enum
 
+EXAMPLE_INSERT_KEYS = [10, 20, 30, 15, 25, 5, 1, 50, 60, 55]
+
 class Color(Enum):
     RED = 1
     BLACK = 2
@@ -187,3 +189,16 @@ class RedBlackTree:
             print(f"{node.key}({color_str})")
             self.debug_print(node.left, indent, False)
             self.debug_print(node.right, indent, True)
+
+
+def main() -> None:
+    tree = RedBlackTree()
+    print("Insert sequence:", EXAMPLE_INSERT_KEYS)
+    for key in EXAMPLE_INSERT_KEYS:
+        tree.insert(key)
+        print(f"\nAfter insert({key}):")
+        tree.debug_print(tree.root)
+
+
+if __name__ == "__main__":
+    main()

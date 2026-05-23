@@ -3,20 +3,36 @@ from __future__ import annotations
 from manim import *
 
 from binary_heap import BinaryHeap
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
 
-# Match suffix_tree_manim palette
-BG_DARK = "#121317"
-TEXT_MUTED = "#8E929D"
-NODE_NEUTRAL = "#2A3B49"
-NODE_ACTIVE = "#00E5FF"
-EDGE_ACTIVE = "#FFB000"
-NODE_LEAF = "#2E7D32"
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class BinaryHeapAnim(Scene):
     def construct(self):
         self.camera.background_color = BG_DARK
-        self.subtitle_font = "Arial"
+        self.subtitle_font = SUBTITLE_FONT
 
         pace = 1.1
 

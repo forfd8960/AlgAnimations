@@ -3,21 +3,36 @@ from __future__ import annotations
 from manim import *
 
 from suffix_tree import Node, SuffixTree
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
 
-# Define a cohesive, high-end tech color palette
-BG_DARK      = "#121317" # Soft dark slate
-TEXT_MUTED   = "#8E929D" # For static UI labels like "contains / count"
-NODE_NEUTRAL = "#2A3B49" # Muted blue-gray for unvisited nodes
-NODE_ACTIVE  = "#00E5FF" # Electric cyan for the node currently being evaluated
-EDGE_ACTIVE  = "#FFB000" # Vibrant amber/gold to track the active traversal path
-NODE_LEAF    = "#2E7D32" # Deep, highly legible green for matching leaves
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class SuffixTreeAnim(Scene):
     def construct(self):
-        
         self.camera.background_color = BG_DARK
-        self.subtitle_font = "Arial"
+        self.subtitle_font = SUBTITLE_FONT
 
         pace = 1.15
 

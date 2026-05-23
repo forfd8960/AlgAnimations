@@ -5,16 +5,43 @@ from bisect import bisect_right
 from manim import *
 
 from btree import BPlusTree, BPlusTreeNode
+try:
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+    from common.color import (
+        BG_DARK,
+        EDGE_ACTIVE,
+        NODE_ACTIVE,
+        NODE_LEAF,
+        NODE_NEUTRAL,
+        SUBTITLE_FONT,
+        TEXT_MUTED,
+    )
 
 
 class BPlusTreeAnim(Scene):
     def construct(self):
+        self.camera.background_color = BG_DARK
+        self.subtitle_font = SUBTITLE_FONT
+
         pace = 1.25
 
         def t(seconds: float) -> float:
             return seconds * pace
 
-        title = Text("B+ Tree", font_size=48).to_edge(UP)
+        title = Text("B+ Tree", font_size=48, color=NODE_ACTIVE).to_edge(UP)
         self.play(Write(title))
 
         subtitle = self.make_subtitle_group(
@@ -26,8 +53,8 @@ class BPlusTreeAnim(Scene):
         min_leaf_keys = (tree.max_keys + 1) // 2
         min_internal_keys = ((tree.order + 1) // 2) - 1
 
-        mode_text = Text("Insert", font_size=30).next_to(title, DOWN)
-        info_text = Text("order=4 (max 3 keys per node)", font_size=24).next_to(mode_text, DOWN)
+        mode_text = Text("Insert", font_size=30, color=TEXT_MUTED).next_to(title, DOWN)
+        info_text = Text("order=4 (max 3 keys per node)", font_size=24, color=TEXT_MUTED).next_to(mode_text, DOWN)
         stats_group = self.make_stats_group(
             tree.order,
             tree.max_keys,
@@ -64,7 +91,7 @@ class BPlusTreeAnim(Scene):
             for node in path_nodes:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=YELLOW), run_time=t(0.35))
+                    self.play(Indicate(group, color=EDGE_ACTIVE), run_time=t(0.35))
 
             self.play(
                 Transform(result_text, self.make_result_text(f"scan: {self.format_scan(tree.scan())}")),
@@ -113,7 +140,7 @@ class BPlusTreeAnim(Scene):
             for node in path_nodes:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=TEAL if hit else RED), run_time=t(0.3))
+                    self.play(Indicate(group, color=NODE_ACTIVE if hit else RED), run_time=t(0.3))
 
             msg = f"get({key}) -> {found_value}" if hit else f"get({key}) -> None"
             self.play(Transform(result_text, self.make_result_text(msg)), run_time=t(0.45))
@@ -160,7 +187,7 @@ class BPlusTreeAnim(Scene):
             for node in path_before:
                 group = node_views.get(id(node))
                 if group is not None:
-                    self.play(Indicate(group, color=ORANGE if deleted else RED), run_time=t(0.28))
+                    self.play(Indicate(group, color=EDGE_ACTIVE if deleted else RED), run_time=t(0.28))
 
             msg = "deleted" if deleted else "not found"
             self.play(
@@ -270,7 +297,7 @@ class BPlusTreeAnim(Scene):
                 continue
             for child in meta["children"]:
                 cx, cdepth = positions[child]
-                edge_color = RED_E if failed and id(child) in highlight_ids else GRAY_B
+                edge_color = RED_D if failed and id(child) in highlight_ids else TEXT_MUTED
                 edge = Line([x, y_of(depth), 0], [cx, y_of(cdepth), 0], color=edge_color, stroke_width=3)
                 edges.add(edge)
 
@@ -280,7 +307,7 @@ class BPlusTreeAnim(Scene):
             lx, ldepth = positions[left_leaf]
             rx, rdepth = positions[right_leaf]
             y = y_of(max(ldepth, rdepth)) - 0.35
-            link = DashedLine([lx + 0.4, y, 0], [rx - 0.4, y, 0], dash_length=0.12, color=GREEN_B)
+            link = DashedLine([lx + 0.4, y, 0], [rx - 0.4, y, 0], dash_length=0.12, color=EDGE_ACTIVE)
             leaf_links.add(link)
 
         for node, (x, depth) in positions.items():
@@ -288,11 +315,11 @@ class BPlusTreeAnim(Scene):
             if failed and is_highlight:
                 fill = RED_D
             elif is_highlight:
-                fill = TEAL_D
+                fill = NODE_ACTIVE
             elif node.leaf:
-                fill = GREEN_E
+                fill = NODE_LEAF
             else:
-                fill = BLUE_E
+                fill = NODE_NEUTRAL
 
             rect = RoundedRectangle(
                 corner_radius=0.1,
@@ -308,7 +335,7 @@ class BPlusTreeAnim(Scene):
             nodes.add(group)
             node_views[id(node)] = group
 
-        leaf_caption = Text("leaf links", font_size=18, color=GREEN_B)
+        leaf_caption = Text("leaf links", font_size=18, color=EDGE_ACTIVE)
         if len(leaves) >= 2:
             first_leaf = leaves[0]
             fx, fdepth = positions[first_leaf]

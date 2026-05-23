@@ -1,0 +1,23 @@
+# Tree Data Structures Summary
+
+| Data Structure | Brief Introduction (What It Can Be Used For) | Supported Operations |
+| --- | --- | --- |
+| Binary Tree | The classic foundational tree where each node has at most two children (left and right). Useful for learning traversal patterns and representing hierarchical data. | `insert`, `inorder`, `preorder`, `postorder` |
+| Red-Black Tree | A self-balancing binary search tree that enforces color and rotation rules to keep tree height near logarithmic. Useful for ordered maps/sets where inserts and lookups should stay consistently fast. | `insert`, `debug_print` |
+| Treap | A randomized balanced BST (BST by key + heap by priority). Useful when you want expected logarithmic performance with simpler balancing logic. | `insert`, `search`, `split`, `merge`, `delete`, `inorder`, `display` |
+| Trie | A prefix tree for strings. Useful for autocomplete, dictionary lookup, and prefix-based filtering. | `insert`, `search`, `starts_with` |
+| Radix Tree | A compressed trie that merges single-child paths to save space. Useful for fast prefix queries with better memory behavior than a plain trie. | `insert`, `search`, `delete`, `starts_with`, `items`, `validate` |
+| Suffix Tree | An index over all suffixes of a text. Useful for fast substring queries, finding occurrences, and pattern analysis on strings. | `contains`, `find_all`, `count`, `dump_edges` |
+| Merkle Tree | A hash tree where each internal node stores the hash of its children, giving tamper-evident verification of data blocks. Useful for integrity proofs, blockchain structures, and audit logs. | `root_hash`, `root_hex`, `get_proof`, `verify_proof`, `verify_leaf`, `update_leaf`, `append_leaf`, `leaf_hashes_hex`, `level_hex`, `dump`, `__len__` |
+| KD-Tree | A space-partitioning tree for k-dimensional points. Useful for nearest-neighbor search, k-NN, and geometric range queries. | `insert`, `contains`, `nearest`, `k_nearest`, `range_search`, `delete` |
+| Quadtree | A 2D spatial partitioning tree that recursively subdivides regions into four quadrants. Useful for collision checks, map indexing, and spatial querying in 2D. | `insert`, `query_range`, `query_radius`, `remove`, `clear`, `stats`, `__len__` |
+| Octree | A 3D spatial partitioning tree that recursively subdivides space into eight cells. Useful for 3D collision detection, volume queries, and spatial indexing. | `insert`, `query_box`, `query_radius`, `remove`, `clear`, `stats`, `__len__` |
+| R-Tree | A bounding-rectangle index for spatial objects. Useful for GIS, rectangle intersection queries, and dynamic spatial databases. | `insert`, `search` |
+| Binary Heap | A complete binary tree structure usually stored in an array, supporting efficient priority access. Useful for priority queues and scheduling. | `push`, `peek`, `pop`, `replace`, `pushpop`, `clear`, `to_list`, `heap_sort`, `validate`, `__len__` |
+| B+ Tree (in btree.py) | A balanced multi-way search tree optimized for block/page access, with keys in leaves and linked leaf-level scans. Useful for database and filesystem indexes. | `insert`, `get`, `delete`, `scan` |
+| B* Tree | A B-tree variant with higher node occupancy through redistribution/split strategies. Useful for storage/index systems where space utilization and balanced access matter. | `insert`, `search`, `delete`, `validate` |
+| Segment Tree | A binary tree over array intervals for fast range aggregation and updates. Useful for range-sum/range-update workloads in analytics and competitive programming. | `range_add`, `point_set`, `range_sum` |
+| Fenwick Tree (Binary Indexed Tree) | A compact tree-like indexed structure for prefix aggregates. Useful for dynamic prefix/range sums with low memory overhead. | `add`, `point_set`, `prefix_sum`, `range_sum` |
+| Disjoint Set Forest (Union-Find) | A forest structure for tracking connected components using path compression and union by rank/size patterns. Useful for connectivity queries, clustering, and Kruskal-style workflows. | `find`, `union`, `connected`, `component_size` |
+| Link-Cut Tree | A dynamic tree structure for forests that supports path-based queries/updates under link/cut operations. Useful for dynamic graph/tree algorithms with changing topology. | `make_tree`, `connected`, `link`, `cut`, `set_value`, `path_sum` |
+| Finger Tree | A sequence structure with efficient access at both ends and good concatenation behavior. Useful for editor buffers, deque-like workloads, and persistent sequence processing. | `empty`, `from_iter`, `prepend`, `append`, `peek_left`, `peek_right`, `pop_left`, `pop_right`, `concat`, `to_list`, `__iter__`, `__len__` |

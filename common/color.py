@@ -5,3 +5,5 @@ NODE_NEUTRAL = "#2A3B49" # Muted blue-gray for unvisited nodes
 NODE_ACTIVE  = "#00E5FF" # Electric cyan for the node currently being evaluated
 EDGE_ACTIVE  = "#FFB000" # Vibrant amber/gold to track the active traversal path
 NODE_LEAF    = "#2E7D32" # Deep, highly legible green for matching leaves
+
+SUBTITLE_FONT = "Arial"
